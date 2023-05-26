@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/GeneralFire/TillSummerBotGo/internal/commandhandlers"
 	"github.com/GeneralFire/TillSummerBotGo/internal/config"
@@ -14,17 +16,31 @@ import (
 func main() {
 	path, _ := os.Getwd()
 	log.Println(path)
-	service := GetRawDomain(".BOT_TOKEN")
-	service.SetHandler(
-		"hello",
+	botService := GetBotService(".BOT_TOKEN")
+
+	botService.SetHandler(
+		service.CommandDescriptor{
+			Prefix: "hello",
+			Help:   "Send hello message",
+		},
 		commandhandlers.HelloHandler,
 	)
 
-	err := service.Serve()
-	fmt.Println(err)
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		botService.Stop()
+	}()
+
+	botService.ExposeChatButtons()
+	err := botService.Serve()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
-func GetRawDomain(ymlTokenFile string) service.BotService {
+func GetBotService(ymlTokenFile string) service.BotService {
 	token, err := config.GetTokenYAML(
 		ymlTokenFile,
 	)
