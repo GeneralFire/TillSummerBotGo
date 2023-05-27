@@ -4,15 +4,15 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type Helloer interface {
-	GetHello() string
+type Passeder interface {
+	GetPassedTime() string
 }
 
-func GetHelloHandler(halloer Helloer) func(update tgbotapi.Update) tgbotapi.MessageConfig {
+func GetPassedHandler(p Passeder) func(update tgbotapi.Update) tgbotapi.MessageConfig {
 	return func(update tgbotapi.Update) tgbotapi.MessageConfig {
 		return tgbotapi.NewMessage(
 			update.Message.Chat.ID,
-			halloer.GetHello(),
+			p.GetPassedTime(),
 		)
 	}
 }

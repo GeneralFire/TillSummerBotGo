@@ -9,21 +9,29 @@ import (
 
 	"github.com/GeneralFire/TillSummerBotGo/internal/commandhandlers"
 	"github.com/GeneralFire/TillSummerBotGo/internal/config"
+	"github.com/GeneralFire/TillSummerBotGo/internal/domain"
 	"github.com/GeneralFire/TillSummerBotGo/internal/logger"
 	"github.com/GeneralFire/TillSummerBotGo/internal/service"
 )
 
 func main() {
-	path, _ := os.Getwd()
-	log.Println(path)
 	botService := GetBotService(".BOT_TOKEN")
 
+	domain := domain.New()
 	botService.SetHandler(
 		service.CommandDescriptor{
 			Prefix: "hello",
 			Help:   "Send hello message",
 		},
-		commandhandlers.HelloHandler,
+		commandhandlers.GetHelloHandler(&domain),
+	)
+
+	botService.SetHandler(
+		service.CommandDescriptor{
+			Prefix: "passed",
+			Help:   "Get time passed",
+		},
+		commandhandlers.GetPassedHandler(&domain),
 	)
 
 	sigs := make(chan os.Signal, 1)

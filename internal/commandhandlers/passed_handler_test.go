@@ -7,19 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const HELLO_MSG = "Hallo"
+const PassedMsg = "Passed 3 days"
 
-type HelloerStub struct{}
+type PassedStub struct{}
 
-func (h HelloerStub) GetHello() string {
-	return HELLO_MSG
+func (h *PassedStub) GetPassedTime() string {
+	return PassedMsg
 }
-func TestHelloHandler(t *testing.T) {
+func TestPassedHandler(t *testing.T) {
 	update := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
-	halloer := HelloerStub{}
-
-	handler := GetHelloHandler(halloer)
+	passed := PassedStub{}
+	handler := GetPassedHandler(&passed)
 	msg := handler(update)
 
-	assert.Equal(t, msg.Text, HELLO_MSG)
+	assert.Equal(t, msg.Text, PassedMsg)
 }
