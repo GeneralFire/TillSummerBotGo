@@ -2,6 +2,7 @@ package commandhandlers
 
 import (
 	"testing"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/stretchr/testify/assert"
@@ -9,14 +10,14 @@ import (
 
 const PassedMsg = "Passed 3 days"
 
-type PassedStub struct{}
+type SummerTimeGetterStub struct{}
 
-func (h *PassedStub) GetPassedTime() string {
+func (h *SummerTimeGetterStub) GetSummerTime(time.Time) string {
 	return PassedMsg
 }
 func TestPassedHandler(t *testing.T) {
 	update := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
-	passed := PassedStub{}
+	passed := SummerTimeGetterStub{}
 	handler := GetPassedHandler(&passed)
 	msg := handler(update)
 

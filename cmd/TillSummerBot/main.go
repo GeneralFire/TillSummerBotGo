@@ -28,8 +28,8 @@ func main() {
 
 	botService.SetHandler(
 		service.CommandDescriptor{
-			Prefix: "passed",
-			Help:   "Get time passed",
+			Prefix: "summertime",
+			Help:   "Get time till Summer or time passed",
 		},
 		commandhandlers.GetPassedHandler(&domain),
 	)
