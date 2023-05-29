@@ -11,7 +11,7 @@ type SummerTimeGetter interface {
 	GetSummerTime(time.Time) (time.Duration, bool)
 }
 
-func GetPassedHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbotapi.MessageConfig {
+func GetSummertimeHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbotapi.MessageConfig {
 	return func(update tgbotapi.Update) tgbotapi.MessageConfig {
 		t, b := p.GetSummerTime(time.Now())
 		msgText := fmt.Sprintf("%v %v", t, b)

@@ -19,10 +19,11 @@ type SummerTimeGetterStub struct{}
 func (h *SummerTimeGetterStub) GetSummerTime(time.Time) (time.Duration, bool) {
 	return SAMPLE_DURATION, SAMPLE_SUMMER
 }
-func TestPassedHandler(t *testing.T) {
+
+func TestSummertimeHandler(t *testing.T) {
 	update := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
 	passed := SummerTimeGetterStub{}
-	handler := GetPassedHandler(&passed)
+	handler := GetSummertimeHandler(&passed)
 	msg := handler(update)
 
 	assert.Equal(

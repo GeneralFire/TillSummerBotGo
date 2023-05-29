@@ -31,7 +31,7 @@ func main() {
 			Prefix: "summertime",
 			Help:   "Get time till Summer or time passed",
 		},
-		commandhandlers.GetPassedHandler(&domain),
+		commandhandlers.GetSummertimeHandler(&domain),
 	)
 
 	sigs := make(chan os.Signal, 1)
