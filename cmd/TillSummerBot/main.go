@@ -9,15 +9,15 @@ import (
 
 	"github.com/GeneralFire/TillSummerBotGo/internal/commandhandlers"
 	"github.com/GeneralFire/TillSummerBotGo/internal/config"
-	"github.com/GeneralFire/TillSummerBotGo/internal/domain"
 	"github.com/GeneralFire/TillSummerBotGo/internal/logger"
 	"github.com/GeneralFire/TillSummerBotGo/internal/service"
+	"github.com/GeneralFire/TillSummerBotGo/internal/timecalculator"
 )
 
 func main() {
 	botService := GetBotService(".BOT_TOKEN")
 
-	domain := domain.New()
+	domain := timecalculator.New()
 	botService.SetHandler(
 		service.CommandDescriptor{
 			Prefix: "hello",

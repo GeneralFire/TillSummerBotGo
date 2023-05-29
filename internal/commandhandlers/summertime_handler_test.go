@@ -1,6 +1,7 @@
 package commandhandlers
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -8,12 +9,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const PassedMsg = "Passed 3 days"
+var (
+	SAMPLE_DURATION = 3 * time.Hour
+	SAMPLE_SUMMER   = false
+)
 
 type SummerTimeGetterStub struct{}
 
-func (h *SummerTimeGetterStub) GetSummerTime(time.Time) string {
-	return PassedMsg
+func (h *SummerTimeGetterStub) GetSummerTime(time.Time) (time.Duration, bool) {
+	return SAMPLE_DURATION, SAMPLE_SUMMER
 }
 func TestPassedHandler(t *testing.T) {
 	update := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
@@ -21,5 +25,9 @@ func TestPassedHandler(t *testing.T) {
 	handler := GetPassedHandler(&passed)
 	msg := handler(update)
 
-	assert.Equal(t, msg.Text, PassedMsg)
+	assert.Equal(
+		t,
+		msg.Text,
+		fmt.Sprintf("%v %v", SAMPLE_DURATION, SAMPLE_SUMMER),
+	)
 }
