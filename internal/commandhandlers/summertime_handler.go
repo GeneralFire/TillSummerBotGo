@@ -12,7 +12,7 @@ type SummerTimeGetter interface {
 }
 
 const (
-	UNTIL_SUMMER     = "%d days left until summer"
+	UNTIL_SUMMER     = "%d days left until summer (or %.2f hours)"
 	UNTIL_SUMMER_END = "%d dyas left until the end of summer(%.2f)"
 
 	HOURS_IN_DAY = 24
@@ -37,7 +37,7 @@ func GetSummertimeHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbot
 				1-timeLeft.Hours()/TOTAL_SUMMER_TIME.Hours(),
 			)
 		} else {
-			msgText = fmt.Sprintf(UNTIL_SUMMER, days)
+			msgText = fmt.Sprintf(UNTIL_SUMMER, days, timeLeft.Hours())
 		}
 		return tgbotapi.NewMessage(
 			update.Message.Chat.ID,
