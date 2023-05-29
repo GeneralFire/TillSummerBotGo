@@ -4,16 +4,6 @@ import (
 	"time"
 )
 
-const (
-	HOURS_IN_DAY = 24
-
-	JUNE_DAYS_COUNT           = 30
-	JULE_DAYS_COUNT           = 31
-	AUGUST_DAYS_COUNT         = 31
-	TOTAL_SUMMER_TIME_IN_DAYS = JUNE_DAYS_COUNT + JULE_DAYS_COUNT + AUGUST_DAYS_COUNT
-	TOTAL_SUMMER_TIME         = TOTAL_SUMMER_TIME_IN_DAYS * HOURS_IN_DAY * time.Hour
-)
-
 type Domain struct{}
 
 func New() Domain {
