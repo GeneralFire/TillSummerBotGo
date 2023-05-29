@@ -19,6 +19,8 @@ type testDataStruct struct {
 	want    summerTimeReturn
 }
 
+const TOTAL_SUMMER_TIME = (31 + 31 + 30) * 24 * time.Hour
+
 func TestGetSummerTime(t *testing.T) {
 	domainInstance := timecalculator.New()
 
@@ -27,7 +29,7 @@ func TestGetSummerTime(t *testing.T) {
 			name:    "First summer day",
 			timeNow: time.Date(2000, time.June, 1, 0, 0, 0, 0, time.Local),
 			want: summerTimeReturn{
-				t:      timecalculator.TOTAL_SUMMER_TIME,
+				t:      TOTAL_SUMMER_TIME,
 				summer: true,
 			},
 		},
@@ -43,7 +45,7 @@ func TestGetSummerTime(t *testing.T) {
 			name:    "One day after summer",
 			timeNow: time.Date(2000, time.September, 1, 0, 0, 0, 0, time.Local),
 			want: summerTimeReturn{
-				t:      time.Hour*24*365 - timecalculator.TOTAL_SUMMER_TIME,
+				t:      time.Hour*24*365 - TOTAL_SUMMER_TIME,
 				summer: false,
 			},
 		},
