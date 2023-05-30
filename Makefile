@@ -8,4 +8,4 @@ test:
 	go test ./...
 
 run:
-	go run .\cmd\TillSummerBot\main.go
+	go run ./cmd/TillSummerBot/main.go
