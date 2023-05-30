@@ -1,0 +1,4 @@
+APIToken: __placeholder__
+SQL:
+    driver: mysql
+    connect: __placeholder__
