@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/robfig/cron"
@@ -64,10 +63,9 @@ func (d *BotService) SetHandler(
 	d.commandsDescriptors = append(d.commandsDescriptors, descriptor)
 }
 
-func (d *BotService) CronCallHandlerForAllChat(cronTime, handler string) {
+func (d *BotService) CronCallHandlerForAllChat(cronTime, handler string) error {
 	if _, ok := d.handlerMap[handler]; !ok {
-		// TODO: remove panic
-		log.Panicf(fmt.Sprintf("cannot find handler for %s", handler))
+		return fmt.Errorf("cannot find handler for %s", handler)
 	}
 
 	updateStub := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
@@ -100,8 +98,10 @@ func (d *BotService) CronCallHandlerForAllChat(cronTime, handler string) {
 			}
 		},
 	); err != nil {
-		log.Panicf(err.Error())
+		return fmt.Errorf("cron AddFunc: %w", err)
 	}
+
+	return nil
 }
 
 func (d *BotService) Serve() error {

@@ -101,8 +101,10 @@ func AddCommandHandlers(botService *service.BotService, repo service.Repository)
 		commandhandlers.GetUnsubscribeHandler(repo),
 	)
 
-	botService.CronCallHandlerForAllChat(
+	if err := botService.CronCallHandlerForAllChat(
 		"0 0 15 * * *",
 		summertimeCommandDesc.Command,
-	)
+	); err != nil {
+		log.Fatal(err)
+	}
 }
