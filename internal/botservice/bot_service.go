@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/robfig/cron"
@@ -19,9 +20,9 @@ type Logger interface {
 }
 
 type Repository interface {
-	GetAllSubscribedChat() []int
-	SubscribeChat(id int) error
-	UnsubscribeChat(id int) error
+	GetAllSubscribedChat() ([]int64, error)
+	SubscribeChat(id int64) error
+	UnsubscribeChat(id int64) error
 }
 
 type BotService struct {
@@ -29,11 +30,13 @@ type BotService struct {
 	handlerMap          map[string]HandlerFunc
 	commandsDescriptors []CommandDescriptor
 	logger              Logger
+	repository          Repository
 }
 
 func Init(
 	apiToken string,
 	logger Logger,
+	repo Repository,
 ) (*BotService, error) {
 	bot, err := tgbotapi.NewBotAPI(apiToken)
 	if err != nil {
@@ -44,6 +47,7 @@ func Init(
 		bot:        bot,
 		logger:     logger,
 		handlerMap: make(map[string]HandlerFunc),
+		repository: repo,
 	}, nil
 }
 
@@ -57,12 +61,43 @@ func (d *BotService) SetHandler(
 
 func (d *BotService) CallHandlerAt(cronTime, handler string) {
 	c := cron.New()
-	c.AddFunc(
+	if _, ok := d.handlerMap[handler]; !ok {
+		// TODO: remove panic
+		log.Panicf(fmt.Sprintf("cannot find handler for %s", handler))
+	}
+
+	updateStub := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
+
+	if err := c.AddFunc(
 		cronTime,
 		func() {
-			// allChats := d.bot.
+			msgText := d.handlerMap[handler](updateStub).Text
+
+			allChats, err := d.repository.GetAllSubscribedChat()
+			if err != nil {
+				d.logger.Log(
+					fmt.Sprintf("get all chats err: %s", err.Error()),
+				)
+			}
+			if len(allChats) == 0 {
+				d.logger.Log("no chats")
+			}
+
+			for _, chatId := range allChats {
+				msg := tgbotapi.NewMessage(chatId, msgText)
+				_, err := d.bot.Send(msg)
+				if err != nil {
+					d.logger.Log(
+						fmt.Sprintf(
+							"cannot send msg %v to %d", msg, chatId,
+						),
+					)
+				}
+			}
 		},
-	)
+	); err != nil {
+		log.Panicf(err.Error())
+	}
 }
 
 func (d *BotService) Serve() error {
@@ -117,4 +152,8 @@ func (d *BotService) ExposeChatButtons() error {
 
 func (d *BotService) Stop() {
 	d.bot.StopReceivingUpdates()
+}
+
+func (d *BotService) GetRepo() Repository {
+	return d.repository
 }
