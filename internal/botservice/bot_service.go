@@ -9,8 +9,8 @@ import (
 )
 
 type CommandDescriptor struct {
-	Prefix string
-	Help   string
+	Command string
+	Help    string
 }
 
 type HandlerFunc func(tgbotapi.Update) tgbotapi.MessageConfig
@@ -31,6 +31,7 @@ type BotService struct {
 	commandsDescriptors []CommandDescriptor
 	logger              Logger
 	repository          Repository
+	cronInstance        *cron.Cron
 }
 
 func Init(
@@ -43,11 +44,15 @@ func Init(
 		return nil, err
 	}
 
+	cronInstance := cron.New()
+	cronInstance.Start()
+
 	return &BotService{
-		bot:        bot,
-		logger:     logger,
-		handlerMap: make(map[string]HandlerFunc),
-		repository: repo,
+		bot:          bot,
+		logger:       logger,
+		handlerMap:   make(map[string]HandlerFunc),
+		repository:   repo,
+		cronInstance: cronInstance,
 	}, nil
 }
 
@@ -55,12 +60,11 @@ func (d *BotService) SetHandler(
 	descriptor CommandDescriptor,
 	handler HandlerFunc,
 ) {
-	d.handlerMap[descriptor.Prefix] = handler
+	d.handlerMap[descriptor.Command] = handler
 	d.commandsDescriptors = append(d.commandsDescriptors, descriptor)
 }
 
-func (d *BotService) CallHandlerAt(cronTime, handler string) {
-	c := cron.New()
+func (d *BotService) CronCallHandlerForAllChat(cronTime, handler string) {
 	if _, ok := d.handlerMap[handler]; !ok {
 		// TODO: remove panic
 		log.Panicf(fmt.Sprintf("cannot find handler for %s", handler))
@@ -68,7 +72,7 @@ func (d *BotService) CallHandlerAt(cronTime, handler string) {
 
 	updateStub := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
 
-	if err := c.AddFunc(
+	if err := d.cronInstance.AddFunc(
 		cronTime,
 		func() {
 			msgText := d.handlerMap[handler](updateStub).Text
@@ -139,7 +143,7 @@ func (d *BotService) ExposeChatButtons() error {
 	for _, command := range d.commandsDescriptors {
 		commands = append(commands,
 			tgbotapi.BotCommand{
-				Command:     command.Prefix,
+				Command:     command.Command,
 				Description: command.Help,
 			},
 		)
@@ -151,9 +155,6 @@ func (d *BotService) ExposeChatButtons() error {
 }
 
 func (d *BotService) Stop() {
+	d.cronInstance.Stop()
 	d.bot.StopReceivingUpdates()
-}
-
-func (d *BotService) GetRepo() Repository {
-	return d.repository
 }

@@ -69,33 +69,40 @@ func AddCommandHandlers(botService *service.BotService, repo service.Repository)
 	timeCalculator := timecalculator.New()
 	botService.SetHandler(
 		service.CommandDescriptor{
-			Prefix: "hello",
-			Help:   "Send hello message",
+			Command: "hello",
+			Help:    "Send hello message",
 		},
 		commandhandlers.GetHelloHandler(&timeCalculator),
 	)
 
+	summertimeCommandDesc := service.CommandDescriptor{
+		Command: "summertime",
+		Help:    "Get time till Summer or time passed",
+	}
+
 	botService.SetHandler(
-		service.CommandDescriptor{
-			Prefix: "summertime",
-			Help:   "Get time till Summer or time passed",
-		},
+		summertimeCommandDesc,
 		commandhandlers.GetSummertimeHandler(&timeCalculator),
 	)
 
 	botService.SetHandler(
 		service.CommandDescriptor{
-			Prefix: "subscribe",
-			Help:   "Subscibe chat",
+			Command: "subscribe",
+			Help:    "Subscibe chat",
 		},
 		commandhandlers.GetSubscribeHandler(repo),
 	)
 
 	botService.SetHandler(
 		service.CommandDescriptor{
-			Prefix: "unsubscribe",
-			Help:   "Unsubscibe chat",
+			Command: "unsubscribe",
+			Help:    "Unsubscibe chat",
 		},
 		commandhandlers.GetUnsubscribeHandler(repo),
+	)
+
+	botService.CronCallHandlerForAllChat(
+		"0 0 15 * * *",
+		summertimeCommandDesc.Command,
 	)
 }
