@@ -1,5 +1,7 @@
 package commandhandlers
 
+//go:generate minimock -i SummerTimeGetter -o ./ -s "_minimock.go"
+
 import (
 	"fmt"
 	"time"
@@ -12,8 +14,8 @@ type SummerTimeGetter interface {
 }
 
 const (
-	UNTIL_SUMMER     = "%d days left until summer (or %.2f hours)"
-	UNTIL_SUMMER_END = "%d dyas left until the end of summer(%.2f)"
+	UNTIL_SUMMER     = "%d full days left until summer (or %s)"
+	UNTIL_SUMMER_END = "%d full days left until the end of summer(%.2f)"
 
 	HOURS_IN_DAY = 24
 
@@ -26,7 +28,7 @@ const (
 
 func GetSummertimeHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbotapi.MessageConfig {
 	return func(update tgbotapi.Update) tgbotapi.MessageConfig {
-		timeLeft, summer := p.GetSummerTime(time.Now())
+		timeLeft, summer := p.GetSummerTime(time.Now().Add(time.Hour * 3))
 		days := timeLeft / (time.Hour * HOURS_IN_DAY)
 		var msgText string
 
@@ -37,7 +39,31 @@ func GetSummertimeHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbot
 				1-timeLeft.Hours()/TOTAL_SUMMER_TIME.Hours(),
 			)
 		} else {
-			msgText = fmt.Sprintf(UNTIL_SUMMER, days, timeLeft.Hours())
+			var hoursAsString, minutesAsString, secondsAsString string
+			hours := int32(timeLeft.Hours())
+			if hours < 10 {
+				hoursAsString = fmt.Sprintf("0%d", hours)
+			} else {
+				hoursAsString = fmt.Sprintf("%d", hours)
+			}
+			minutes := int32(timeLeft.Minutes()) % 60
+			if minutes < 10 {
+				minutesAsString = fmt.Sprintf("0%d", minutes)
+			} else {
+				minutesAsString = fmt.Sprintf("%d", minutes)
+			}
+			seconds := int32(timeLeft.Seconds()) % 60
+			if seconds < 10 {
+				secondsAsString = fmt.Sprintf("0%d", seconds)
+			} else {
+				secondsAsString = fmt.Sprintf("%d", seconds)
+			}
+
+			msgText = fmt.Sprintf(
+				UNTIL_SUMMER,
+				days,
+				fmt.Sprintf("%s:%s:%s", hoursAsString, minutesAsString, secondsAsString), // timeLeft.Hours(),
+			)
 		}
 		return tgbotapi.NewMessage(
 			update.Message.Chat.ID,
