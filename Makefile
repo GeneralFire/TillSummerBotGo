@@ -6,3 +6,6 @@ upload:
 
 test:
 	go test ./...
+
+run:
+	go run .\cmd\TillSummerBot\main.go
