@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/robfig/cron"
 )
 
 type CommandDescriptor struct {
@@ -15,6 +16,12 @@ type HandlerFunc func(tgbotapi.Update) tgbotapi.MessageConfig
 
 type Logger interface {
 	Log(string)
+}
+
+type Repository interface {
+	GetAllSubscribedChat() []int
+	SubscribeChat(id int) error
+	UnsubscribeChat(id int) error
 }
 
 type BotService struct {
@@ -46,6 +53,16 @@ func (d *BotService) SetHandler(
 ) {
 	d.handlerMap[descriptor.Prefix] = handler
 	d.commandsDescriptors = append(d.commandsDescriptors, descriptor)
+}
+
+func (d *BotService) CallHandlerAt(cronTime, handler string) {
+	c := cron.New()
+	c.AddFunc(
+		cronTime,
+		func() {
+			// allChats := d.bot.
+		},
+	)
 }
 
 func (d *BotService) Serve() error {

@@ -7,10 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	service "github.com/GeneralFire/TillSummerBotGo/internal/botservice"
 	"github.com/GeneralFire/TillSummerBotGo/internal/commandhandlers"
 	"github.com/GeneralFire/TillSummerBotGo/internal/config"
 	"github.com/GeneralFire/TillSummerBotGo/internal/logger"
-	"github.com/GeneralFire/TillSummerBotGo/internal/service"
 	"github.com/GeneralFire/TillSummerBotGo/internal/timecalculator"
 )
 
