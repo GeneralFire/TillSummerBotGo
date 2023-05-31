@@ -52,13 +52,13 @@ func TestSummertimeHandler(t *testing.T) {
 			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER, 0, "05:25:25"),
 		},
 		{
-			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 0, 0.99),
+			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 0, 99.09),
 		},
 		{
-			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 2, 0.98),
+			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 2, 97.77),
 		},
 		{
-			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 91, 0.00),
+			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 91, 0.03),
 		},
 	}
 
