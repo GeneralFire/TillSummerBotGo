@@ -31,15 +31,19 @@ func TestSummertimeHandler(t *testing.T) {
 			b: false,
 		},
 		{
-			t: time.Hour*19 + time.Minute*59 + time.Second*25, // 0, 0.98
+			t: time.Hour*19 + time.Minute*59 + time.Second*25,
 			b: true,
 		},
 		{
-			t: time.Hour*49 + time.Minute*15 + time.Second*13, // 2, 0.98
+			t: time.Hour*49 + time.Minute*15 + time.Second*13,
 			b: true,
 		},
 		{
-			t: time.Hour*2207 + time.Minute*15 + time.Second*13, // 91, 0.98
+			t: time.Hour*2207 + time.Minute*15 + time.Second*13,
+			b: true,
+		},
+		{
+			t: time.Hour*0 + time.Minute*1 + time.Second*59, // 91, 0.98
 			b: true,
 		},
 	}
@@ -59,6 +63,9 @@ func TestSummertimeHandler(t *testing.T) {
 		},
 		{
 			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 91, 0.03),
+		},
+		{
+			msg: fmt.Sprintf(commandhandlers.UNTIL_SUMMER_END, 0, 100.00),
 		},
 	}
 
