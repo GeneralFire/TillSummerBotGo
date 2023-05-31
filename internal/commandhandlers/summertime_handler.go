@@ -15,7 +15,7 @@ type SummerTimeGetter interface {
 
 const (
 	UNTIL_SUMMER     = "%d full days left until summer (or %s)"
-	UNTIL_SUMMER_END = "%d full days left until the end of summer(%.2f%% complete)"
+	UNTIL_SUMMER_END = "%d full days left until the end of summer(%3.2f%% complete)"
 
 	HOURS_IN_DAY = 24
 
@@ -36,7 +36,7 @@ func GetSummertimeHandler(p SummerTimeGetter) func(update tgbotapi.Update) tgbot
 			msgText = fmt.Sprintf(
 				UNTIL_SUMMER_END,
 				days,
-				1-timeLeft.Hours()/TOTAL_SUMMER_TIME.Hours(),
+				(1-timeLeft.Hours()/TOTAL_SUMMER_TIME.Hours())*100,
 			)
 		} else {
 			var hoursAsString, minutesAsString, secondsAsString string
