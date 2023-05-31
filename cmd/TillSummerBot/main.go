@@ -102,7 +102,7 @@ func AddCommandHandlers(botService *service.BotService, repo service.Repository)
 	)
 
 	if err := botService.CronCallHandlerForAllChat(
-		"0 0 15 * * *",
+		"0 0 9 * * *",
 		summertimeCommandDesc.Command,
 	); err != nil {
 		log.Fatal(err)
