@@ -67,13 +67,13 @@ func GetConfig(ymlConfigFile string) *config.BotConfig {
 
 func AddCommandHandlers(botService *service.BotService, repo service.Repository) {
 	timeCalculator := timecalculator.New()
-	botService.SetHandler(
-		service.CommandDescriptor{
-			Command: "hello",
-			Help:    "Send hello message",
-		},
-		commandhandlers.GetHelloHandler(&timeCalculator),
-	)
+	// botService.SetHandler(
+	// 	service.CommandDescriptor{
+	// 		Command: "hello",
+	// 		Help:    "Send hello message",
+	// 	},
+	// 	commandhandlers.GetHelloHandler(&timeCalculator),
+	// )
 
 	summertimeCommandDesc := service.CommandDescriptor{
 		Command: "summertime",
