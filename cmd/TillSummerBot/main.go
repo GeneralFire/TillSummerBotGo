@@ -38,7 +38,9 @@ func main() {
 		log.Panic(err)
 	}
 
-	AddCommandHandlers(botService, repo)
+	AddPublicCommandHandlers(botService, repo)
+	// TODO: fix me
+	botService.AddCronTriggerComand("triggerSend", "summertime")
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -65,7 +67,7 @@ func GetConfig(ymlConfigFile string) *config.BotConfig {
 	return config
 }
 
-func AddCommandHandlers(botService *service.BotService, repo service.Repository) {
+func AddPublicCommandHandlers(botService *service.BotService, repo service.Repository) {
 	timeCalculator := timecalculator.New()
 	// botService.SetHandler(
 	// 	service.CommandDescriptor{

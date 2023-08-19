@@ -63,39 +63,57 @@ func (d *BotService) SetHandler(
 	d.commandsDescriptors = append(d.commandsDescriptors, descriptor)
 }
 
+func (d *BotService) manualNotificator(handler string) HandlerFunc {
+	return func(tgbotapi.Update) tgbotapi.MessageConfig {
+		d.NotifySubscribedChats(handler)
+		return tgbotapi.MessageConfig{}
+	}
+}
+
+func (d *BotService) AddCronTriggerComand(
+	command string,
+	handler string,
+) {
+	d.handlerMap[command] = d.manualNotificator(handler)
+}
+
+func (d *BotService) NotifySubscribedChats(handler string) {
+	updateStub := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
+
+	msgText := d.handlerMap[handler](updateStub).Text
+
+	allChats, err := d.repository.GetAllSubscribedChat()
+	if err != nil {
+		d.logger.Log(
+			fmt.Sprintf("get all chats err: %s", err.Error()),
+		)
+	}
+	if len(allChats) == 0 {
+		d.logger.Log("no chats")
+	}
+
+	for _, chatId := range allChats {
+		msg := tgbotapi.NewMessage(chatId, msgText)
+		_, err := d.bot.Send(msg)
+		if err != nil {
+			d.logger.Log(
+				fmt.Sprintf(
+					"cannot send msg %v to %d", msg, chatId,
+				),
+			)
+		}
+	}
+}
+
 func (d *BotService) CronCallHandlerForAllChat(cronTime, handler string) error {
 	if _, ok := d.handlerMap[handler]; !ok {
 		return fmt.Errorf("cannot find handler for %s", handler)
 	}
 
-	updateStub := tgbotapi.Update{Message: &tgbotapi.Message{Chat: &tgbotapi.Chat{ID: 1}}}
-
 	if err := d.cronInstance.AddFunc(
 		cronTime,
 		func() {
-			msgText := d.handlerMap[handler](updateStub).Text
-
-			allChats, err := d.repository.GetAllSubscribedChat()
-			if err != nil {
-				d.logger.Log(
-					fmt.Sprintf("get all chats err: %s", err.Error()),
-				)
-			}
-			if len(allChats) == 0 {
-				d.logger.Log("no chats")
-			}
-
-			for _, chatId := range allChats {
-				msg := tgbotapi.NewMessage(chatId, msgText)
-				_, err := d.bot.Send(msg)
-				if err != nil {
-					d.logger.Log(
-						fmt.Sprintf(
-							"cannot send msg %v to %d", msg, chatId,
-						),
-					)
-				}
-			}
+			d.NotifySubscribedChats(handler)
 		},
 	); err != nil {
 		return fmt.Errorf("cron AddFunc: %w", err)
