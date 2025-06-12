@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - 3306:3306
+
+  bot:
+    image: golang:1.24.4-alpine3.21
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - ./:/root
+    entrypoint: [ "go", "run", "./..." ]
+    environment:
+      - DB_DSN=root:example@tcp(db:3306)/mysql
+
+    working_dir: /root

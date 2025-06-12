@@ -64,6 +64,11 @@ func GetConfig(ymlConfigFile string) *config.BotConfig {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	if v := os.Getenv("DB_DSN"); v != "" {
+		config.DB.ConnectString = v
+	}
+
 	return config
 }
 

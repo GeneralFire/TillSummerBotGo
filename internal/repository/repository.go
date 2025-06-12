@@ -18,6 +18,12 @@ func New(builderType sq.PlaceholderFormat, driver, connectString string) (*Repos
 	if err != nil {
 		return nil, err
 	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("db ping error: %w", err)
+	}
+
 	return &Repository{
 		db:               db,
 		statementBuilder: sq.StatementBuilder.PlaceholderFormat(builderType),
